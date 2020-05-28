@@ -10,7 +10,6 @@ struct Person {
     age: usize,
 }
 
-// I AM NOT DONE
 // Your task is to complete this implementation
 // in order for the line `let p = Person::try_from("Mark,20")` to compile
 // and return an Ok result of inner type Person.
@@ -28,6 +27,21 @@ struct Person {
 impl TryFrom<&str> for Person {
     type Error = String;
     fn try_from(s: &str) -> Result<Self, Self::Error> {
+        let fields: Vec<&str> = s.split(',').collect();
+        if fields.len() < 2 { return Err(format!("Unable to split on ',' from {}", s)) };
+
+        let name = String::from(fields[0]);
+        let age = fields[1].parse::<usize>();
+        if age.is_err() { return Err(format!("Unable to parse age as usize from {}", fields[1])) };
+        if name.len() < 1 { return Err(format!("Unable to extract a name from {}", s)) };
+
+        Ok(
+            Person {
+                name: name,
+                age: age.unwrap(),
+            }
+        )
+
     }
 }
 

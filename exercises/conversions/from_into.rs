@@ -18,7 +18,6 @@ impl Default for Person {
     }
 }
 
-// I AM NOT DONE
 // Your task is to complete this implementation
 // in order for the line `let p = Person::from("Mark,20")` to compile
 // Please note that you'll need to parse the age component into a `usize`
@@ -34,6 +33,18 @@ impl Default for Person {
 // Otherwise, then return an instantiated Person onject with the results
 impl From<&str> for Person {
     fn from(s: &str) -> Person {
+        let fields: Vec<&str> = s.split(',').collect();
+        if fields.len() < 2 { return Person::default() };
+
+        let name = String::from(fields[0]);
+        let age = fields[1].parse::<usize>();
+        if age.is_err() { return Person::default() };
+        if name.len() < 1 { return Person::default() };
+
+        Person {
+            name: name,
+            age: age.unwrap(),
+        }
     }
 }
 
@@ -74,6 +85,41 @@ mod tests {
     fn test_bad_age() {
         // Test that "Mark.twenty" will return the default person due to an error in parsing age
         let p = Person::from("Mark,twenty");
+        assert_eq!(p.name, "John");
+        assert_eq!(p.age, 30);
+    }
+
+    #[test]
+    fn test_missing_comma_and_age() {
+        let p: Person = Person::from("Mark");
+        assert_eq!(p.name, "John");
+        assert_eq!(p.age, 30);
+    }
+
+    #[test]
+    fn test_missing_age() {
+        let p: Person = Person::from("Mark,");
+        assert_eq!(p.name, "John");
+        assert_eq!(p.age, 30);
+    }
+
+    #[test]
+    fn test_missing_name() {
+        let p: Person = Person::from(",1");
+        assert_eq!(p.name, "John");
+        assert_eq!(p.age, 30);
+    }
+
+    #[test]
+    fn test_missing_name_and_age() {
+        let p: Person = Person::from(",");
+        assert_eq!(p.name, "John");
+        assert_eq!(p.age, 30);
+    }
+
+    #[test]
+    fn test_missing_name_and_invalid_age() {
+        let p: Person = Person::from(",one");
         assert_eq!(p.name, "John");
         assert_eq!(p.age, 30);
     }
